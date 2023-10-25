@@ -132,3 +132,27 @@ export const deletepermission =async (req, res, next) => {
   }
 }
 
+
+
+/**
+ * @access public
+ * @method put
+ * @route api/permission/status:id
+ */
+
+export const statusPermissionUpdate =async (req, res, next) => {
+  const {id} =await req.params
+  const {status} = req.body;
+
+   try {
+   const permission = await Permission.findByIdAndUpdate(id, {
+    status: !status,
+   }, {new: true})
+
+   const allPermission = await Permission.find()
+   res.status(200).json({permission: allPermission, message: "Status Updated successful"})
+  } catch (error) {
+    next(error)
+  }
+}
+

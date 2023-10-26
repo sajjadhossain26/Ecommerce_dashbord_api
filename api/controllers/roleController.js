@@ -14,13 +14,10 @@ import { createSlug } from '../helper/slug.js'
 export const getAllrole =async (req, res, next) => {
   try {
    const roles = await Role.find()
-    if(roles.length == 0){
-        return res.status(404).json({
-            message: "role data not found"
-        })
+    if(roles.length > 0){
+        res.status(200).json(roles)
     }
 
-    res.status(200).json(roles)
   } catch (error) {
     next(error)
   }
@@ -61,7 +58,7 @@ export const getSinglerole =async (req, res, next) => {
  */
 
 export const createrole =async (req, res, next) => {
-  const {name} =req.body;
+  const {name, permissions} =req.body;
 
   if(!name){
     return res.status(404).json({
@@ -79,7 +76,7 @@ export const createrole =async (req, res, next) => {
   }
 
   try {
-   const role = await Role.create({name, slug: createSlug(name)})
+   const role = await Role.create({name, slug: createSlug(name), permissions})
    res.status(200).json({
     message: "role Created Successfull!",
     role
@@ -98,7 +95,7 @@ export const createrole =async (req, res, next) => {
 
 export const updaterole =async (req, res, next) => {
   const {id} = req.params
-  const {name} = req.body
+  const {name, permissions} = req.body
 
   if(!name){
   return res.status(404).json({
@@ -107,8 +104,8 @@ export const updaterole =async (req, res, next) => {
     
   }
    try {
-   const role = await Role.findByIdAndUpdate(id, {name, slug: createSlug(name)}, {new: true})
-   res.status(200).json(role)
+   const role = await Role.findByIdAndUpdate(id, {name, permissions: permissions, slug: createSlug(name)}, {new: true})
+   res.status(200).json({role, message: "Role updated successful"})
   } catch (error) {
    next(error)
   }

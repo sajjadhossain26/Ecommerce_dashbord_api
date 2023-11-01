@@ -2,6 +2,8 @@ import asyncHandler from "express-async-handler";
 
 import Category from "../models/Category.js";
 import { createSlug } from "../helper/slug.js";
+import { cloudDelete, cloudUpload } from "../utilities/cloudinary.js";
+import { findPublicId } from "../helper/helpers.js";
 
 /**
  * @access public
@@ -96,7 +98,7 @@ export const getSinglecategory = asyncHandler(async (req, res, next) => {
  */
 
 export const createcategory = asyncHandler(async (req, res, next) => {
-  const { name, parentCategory } = req.body;
+  const { name, parentCategory, icon } = req.body;
 
   if (!name) {
     return res.status(404).json({
@@ -104,12 +106,24 @@ export const createcategory = asyncHandler(async (req, res, next) => {
     });
   }
 
-  const findUser = await Category.findOne({ name });
+  const findCategory = await Category.findOne({ name });
 
-  if (findUser) {
+  if (findCategory) {
     return res.status(400).json({
       message: "category Already exist",
     });
+  }
+
+  // category icon
+  let catIcon = null;
+  if (icon) {
+    catIcon = icon;
+  }
+
+  let catPhoto = null;
+  if (req.file) {
+    const cat = await cloudUpload(req);
+    catPhoto = cat.secure_url;
   }
 
   try {
@@ -117,6 +131,8 @@ export const createcategory = asyncHandler(async (req, res, next) => {
       name,
       slug: createSlug(name),
       parentCategory: parentCategory ? parentCategory : null,
+      icon: catIcon,
+      photo: catPhoto,
     });
 
     if (parentCategory) {
@@ -141,7 +157,7 @@ export const createcategory = asyncHandler(async (req, res, next) => {
 
 export const updatecategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, parentCategory, icon } = req.body;
 
   if (!name) {
     return res.status(404).json({
@@ -149,11 +165,40 @@ export const updatecategory = asyncHandler(async (req, res, next) => {
     });
   }
   try {
-    const category = await Category.findByIdAndUpdate(
-      id,
-      { name, slug: createSlug(name) },
-      { new: true }
-    );
+    const category = await Category.findById(id);
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Category not found",
+      });
+    }
+
+    // parent category
+    let parentCat = category.parentCategory;
+    if (parentCategory) {
+      parentCat = parentCategory;
+    }
+
+    // photo update
+    let photo = category.photo;
+    if (req.file) {
+      const cloudPhoto = await cloudUpload(req);
+      photo = cloudPhoto.secure_url;
+      await cloudDelete(findPublicId(category.photo));
+    }
+
+    // icon update
+    let updateIcon = category.icon;
+    if (icon) {
+      updateIcon = icon;
+    }
+
+    category.name = name;
+    category.slug = createSlug(name);
+    category.photo = photo;
+    category.parentCategory = parentCat;
+    category.icon = updateIcon;
+    category.save();
     res.status(200).json({ category, message: "Category updated successful" });
   } catch (error) {
     next(error);
@@ -170,6 +215,7 @@ export const deletecategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   try {
     const category = await Category.findByIdAndDelete(id);
+    await cloudDelete(findPublicId(category.photo));
     res.status(200).json(category);
   } catch (error) {
     next(error);

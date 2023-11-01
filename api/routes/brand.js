@@ -1,5 +1,6 @@
 import express from "express";
 import tokenVerify from "../middlewares/verifyToken.js";
+import multer from "multer";
 
 import {
   createbrand,
@@ -19,8 +20,8 @@ router.route("/").get(getAllbrand).post(brandLogo, createbrand);
 router
   .route("/:id")
   .get(getSinglebrand)
-  .put(updatebrand)
-  .patch(updatebrand)
+  .put(brandLogo, updatebrand)
+  .patch(brandLogo, updatebrand)
   .delete(deletebrand);
 
 // route

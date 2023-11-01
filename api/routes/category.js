@@ -7,18 +7,19 @@ import {
   getSinglecategory,
   updatecategory,
 } from "../controllers/categoryController.js";
+import { categoryPhoto } from "../utilities/multer.js";
 
 const router = express.Router();
 
 router.use(tokenVerify);
 
 // route rest api
-router.route("/").get(getAllcategory).post(createcategory);
+router.route("/").get(getAllcategory).post(categoryPhoto, createcategory);
 router
   .route("/:id")
   .get(getSinglecategory)
-  .put(updatecategory)
-  .patch(updatecategory)
+  .put(categoryPhoto, updatecategory)
+  .patch(categoryPhoto, updatecategory)
   .delete(deletecategory);
 
 // route

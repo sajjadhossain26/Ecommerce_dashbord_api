@@ -1,14 +1,10 @@
 import asyncHandler from "express-async-handler";
 import Brand from "../models/Brand.js";
 import { createSlug } from "../helper/slug.js";
+// import { cloudUpload } from "../utilities/cloudinary.js";
 import cloudinary from "cloudinary";
-import fs from "fs";
-
-cloudinary.v2.config({
-  cloud_name: "dqnsevmgx",
-  api_key: "243622522214831",
-  api_secret: "lHtNOQ2vd4ZcekRu1aQ5K8SvSOg",
-});
+import { cloudDelete, cloudUpload } from "../utilities/cloudinary.js";
+import { findPublicId } from "../helper/helpers.js";
 
 /**
  * @access public
@@ -66,7 +62,6 @@ export const getSinglebrand = asyncHandler(async (req, res, next) => {
 
 export const createbrand = asyncHandler(async (req, res, next) => {
   const { name } = req.body;
-  console.log(req.file);
 
   if (!name) {
     return res.status(404).json({
@@ -82,25 +77,23 @@ export const createbrand = asyncHandler(async (req, res, next) => {
     });
   }
 
-  //   brand logo upload
-  fs.writeFileSync("./" + req.file.originalname, req.file.buffer);
-  const logo = await cloudinary.v2.uploader.upload(
-    "./" + req.file.originalname,
-    req.file.buffer
-  );
-  fs.unlinkSync("./" + req.file.originalname);
-
+  let logoData = null;
+  if (req.file) {
+    logoData = await cloudUpload(req);
+  }
+  console.log(logoData);
   try {
     const brand = await Brand.create({
       name,
       slug: createSlug(name),
-      logo: logo.secure_url ? logo.secure_url : null,
+      logo: logoData.secure_url ? logoData.secure_url : null,
     });
     res.status(200).json({
       message: "brand Created Successfull!",
       brand,
     });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });
@@ -120,16 +113,28 @@ export const updatebrand = asyncHandler(async (req, res, next) => {
       message: "brand name is required!",
     });
   }
-  try {
-    const brand = await Brand.findByIdAndUpdate(
-      id,
-      { name, slug: createSlug(name) },
-      { new: true }
-    );
-    res.status(200).json({ brand, message: "Brand updated successful" });
-  } catch (error) {
-    next(error);
+
+  const brandUpdate = await Brand.findById(id);
+  if (!brandUpdate) {
+    return res.status(404).json({
+      message: "brand data not found",
+    });
   }
+  let updateLogo = brandUpdate.logo;
+  if (req.file) {
+    const logo = await cloudUpload(req);
+    updateLogo = logo.secure_url;
+    await cloudDelete(findPublicId(brandUpdate.logo));
+  }
+
+  brandUpdate.name = name;
+  brandUpdate.slug = createSlug(name);
+  brandUpdate.logo = updateLogo;
+  brandUpdate.save();
+
+  res.status(200).json({
+    message: "Brand data updated successfull",
+  });
 });
 
 /**
@@ -142,6 +147,9 @@ export const deletebrand = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   try {
     const brand = await Brand.findByIdAndDelete(id);
+    const publicId = findPublicId(brand.logo);
+    cloudDelete(publicId);
+
     res.status(200).json(brand);
   } catch (error) {
     next(error);

@@ -8,6 +8,7 @@ import roleRouter from "./routes/role.js";
 import brandRouter from "./routes/brand.js";
 import tagRouter from "./routes/tag.js";
 import categoryRouter from "./routes/category.js";
+import productRouter from "./routes/product.js";
 import mongoDB from "./config/db.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import cookieParser from "cookie-parser";
@@ -42,6 +43,7 @@ app.use("/api/role", roleRouter);
 app.use("/api/brand", brandRouter);
 app.use("/api/tag", tagRouter);
 app.use("/api/category", categoryRouter);
+app.use("/api/product", productRouter);
 
 //custom error handler
 app.use(errorHandler);

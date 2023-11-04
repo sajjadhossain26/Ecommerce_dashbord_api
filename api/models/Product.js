@@ -21,7 +21,7 @@ const productSchema = mongoose.Schema(
     productSimple: {
       regularPrice: {
         type: Number,
-        required: true,
+        // required: true,
       },
       salePrice: {
         type: Number,
@@ -29,7 +29,7 @@ const productSchema = mongoose.Schema(
       },
       productPhotos: {
         type: [String],
-        required: true,
+        // required: true,
       },
       stock: {
         type: Number,
@@ -49,7 +49,7 @@ const productSchema = mongoose.Schema(
         },
         regularPrice: {
           type: Number,
-          required: true,
+          // required: true,
         },
         salePrice: {
           type: Number,
@@ -57,7 +57,7 @@ const productSchema = mongoose.Schema(
         },
         productPhotos: {
           type: [String],
-          required: true,
+          // required: true,
         },
         stock: {
           type: Number,
@@ -70,11 +70,11 @@ const productSchema = mongoose.Schema(
       {
         name: {
           type: String,
-          required: true,
+          // required: true,
         },
         regularPrice: {
           type: Number,
-          required: true,
+          // required: true,
         },
         salePrice: {
           type: Number,
@@ -82,7 +82,7 @@ const productSchema = mongoose.Schema(
         },
         productPhotos: {
           type: [String],
-          required: true,
+          // required: true,
         },
         stock: {
           type: Number,
@@ -94,7 +94,7 @@ const productSchema = mongoose.Schema(
     productExternal: {
       regularPrice: {
         type: Number,
-        required: true,
+        // required: true,
       },
       salePrice: {
         type: Number,
@@ -102,7 +102,7 @@ const productSchema = mongoose.Schema(
       },
       productPhotos: {
         type: [String],
-        required: true,
+        // required: true,
       },
       stock: {
         type: Number,
@@ -110,7 +110,7 @@ const productSchema = mongoose.Schema(
       },
       link: {
         type: String,
-        required: true,
+        // required: true,
       },
     },
 
@@ -133,7 +133,7 @@ const productSchema = mongoose.Schema(
     categories: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "Category",
-      required: true,
+      // required: true,
     },
 
     tags: {

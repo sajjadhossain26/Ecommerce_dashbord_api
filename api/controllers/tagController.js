@@ -19,7 +19,7 @@ export const getAlltag = asyncHandler(async (req, res, next) => {
 
     if (!tags) {
       return res.status(404).json({
-        message: "tag data not found",
+        message: "Tag data not found",
       });
     }
     if (tags.length > 0) {
@@ -61,8 +61,9 @@ export const getSingletag = asyncHandler(async (req, res, next) => {
  * @route api/tag
  */
 
-export const createtag = asyncHandler(async (req, res, next) => {
+export const createtag = async (req, res, next) => {
   const { name } = req.body;
+  console.log(name);
 
   if (!name) {
     return res.status(404).json({
@@ -90,7 +91,7 @@ export const createtag = asyncHandler(async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+};
 
 /**
  * @access public

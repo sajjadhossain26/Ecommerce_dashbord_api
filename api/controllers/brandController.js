@@ -76,12 +76,11 @@ export const createbrand = asyncHandler(async (req, res, next) => {
       message: "brand Already exist",
     });
   }
-
+  console.log(req.file);
   let logoData = null;
   if (req.file) {
     logoData = await cloudUpload(req);
   }
-  console.log(logoData);
   try {
     const brand = await Brand.create({
       name,
@@ -150,7 +149,7 @@ export const deletebrand = asyncHandler(async (req, res, next) => {
     const publicId = findPublicId(brand.logo);
     cloudDelete(publicId);
 
-    res.status(200).json(brand);
+    res.status(200).json({ brand, message: "Brand delete successful" });
   } catch (error) {
     next(error);
   }

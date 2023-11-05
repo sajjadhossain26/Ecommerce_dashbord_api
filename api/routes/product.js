@@ -9,14 +9,14 @@ import {
   getSingleproduct,
   updateproduct,
 } from "../controllers/productController.js";
-// import { productLogo } from "../utilities/multer.js";
+import { productPhoto } from "../utilities/multer.js";
 
 const router = express.Router();
 
 router.use(tokenVerify);
 
 // route rest api
-router.route("/").get(getAllproduct).post(createproduct);
+router.route("/").get(getAllproduct).post(productPhoto, createproduct);
 router
   .route("/:id")
   .get(getSingleproduct)

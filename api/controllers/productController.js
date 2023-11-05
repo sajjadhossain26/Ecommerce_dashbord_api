@@ -1,7 +1,11 @@
 import asyncHandler from "express-async-handler";
 import Product from "../models/Product.js";
 import { createSlug } from "../helper/slug.js";
-import { cloudDelete, cloudUpload } from "../utilities/cloudinary.js";
+import {
+  cloudDelete,
+  cloudUpload,
+  cloudUploads,
+} from "../utilities/cloudinary.js";
 import { findPublicId } from "../helper/helpers.js";
 
 /**
@@ -75,7 +79,6 @@ export const createproduct = asyncHandler(async (req, res, next) => {
       message: "product name is required!",
     });
   }
-  console.log(req.body);
 
   const findUser = await Product.findOne({ name });
 
@@ -89,13 +92,24 @@ export const createproduct = asyncHandler(async (req, res, next) => {
   //   if (req.file) {
   //     logoData = await cloudUpload(req);
   //   }
-  //   console.log(logoData);
+  const simpleData = JSON.parse(productSimple);
+
+  const productPhotos = [];
+
+  if (req.files) {
+    for (let i = 0; i < req.files.length; i++) {
+      const fileData = await cloudUploads(req.files[i].path);
+      productPhotos.push(fileData);
+    }
+  }
+
   try {
     const product = await Product.create({
       name,
       slug: createSlug(name),
       productType,
-      productSimple: productType == "simple" ? productSimple : null,
+      productSimple:
+        productType == "simple" ? { ...simpleData, productPhotos } : null,
       productVariable: productType == "variable" ? productVariable : null,
       productGroup: productType == "group" ? productGroup : null,
       productExternal: productType == "external" ? productExternal : null,
@@ -107,7 +121,6 @@ export const createproduct = asyncHandler(async (req, res, next) => {
       product,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });

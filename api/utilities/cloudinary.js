@@ -13,6 +13,12 @@ export const cloudUpload = async (req) => {
   return data;
 };
 
+export const cloudUploads = async (path) => {
+  // upload brand logo
+  const data = await cloudinary.v2.uploader.upload(path);
+  return data.secure_url;
+};
+
 export const cloudDelete = async (publicId) => {
   // upload brand logo
   const data = await cloudinary.v2.uploader.destroy(publicId);

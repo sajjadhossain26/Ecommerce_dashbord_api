@@ -18,6 +18,11 @@ const productSchema = mongoose.Schema(
       enum: ["simple", "variable", "group", "external"],
       default: "simple",
     },
+
+    productPhotos: {
+      type: [String],
+      default: [],
+    },
     productSimple: {
       regularPrice: {
         type: Number,
@@ -27,10 +32,7 @@ const productSchema = mongoose.Schema(
         type: Number,
         default: 0,
       },
-      productPhotos: {
-        type: [String],
-        // required: true,
-      },
+
       stock: {
         type: Number,
         default: 0,
@@ -55,10 +57,7 @@ const productSchema = mongoose.Schema(
           type: Number,
           default: 0,
         },
-        productPhotos: {
-          type: [String],
-          // required: true,
-        },
+
         stock: {
           type: Number,
           default: 0,
@@ -80,10 +79,7 @@ const productSchema = mongoose.Schema(
           type: Number,
           default: 0,
         },
-        productPhotos: {
-          type: [String],
-          // required: true,
-        },
+
         stock: {
           type: Number,
           default: 0,
@@ -100,10 +96,7 @@ const productSchema = mongoose.Schema(
         type: Number,
         default: 0,
       },
-      productPhotos: {
-        type: [String],
-        // required: true,
-      },
+
       stock: {
         type: Number,
         default: 0,
